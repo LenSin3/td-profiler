@@ -24,6 +24,7 @@ interface SidebarProps {
   hasData: boolean;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  onGoHome: () => void;
   fileName?: string;
 }
 
@@ -33,6 +34,7 @@ export function Sidebar({
   hasData,
   collapsed,
   onToggleCollapse,
+  onGoHome,
   fileName,
 }: SidebarProps) {
   const navItems: NavItem[] = [
@@ -52,8 +54,12 @@ export function Sidebar({
         collapsed ? 'w-16' : 'w-64'
       )}
     >
-      {/* Logo */}
-      <div className="flex items-center gap-3 p-4 border-b border-[var(--color-border)]">
+      {/* Logo - clickable to go back to landing */}
+      <button
+        onClick={onGoHome}
+        className="flex items-center gap-3 p-4 border-b border-[var(--color-border)] hover:bg-[var(--color-surface)] transition-colors duration-200 w-full text-left"
+        title="Back to home"
+      >
         <div className="shrink-0 p-2 rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-accent)] shadow-lg shadow-[var(--color-brand)]/20">
           <Database size={20} className="text-white" />
         </div>
@@ -67,7 +73,7 @@ export function Sidebar({
             </p>
           </div>
         )}
-      </div>
+      </button>
 
       {/* File indicator */}
       {hasData && fileName && (

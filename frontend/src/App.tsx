@@ -87,6 +87,7 @@ function App() {
         hasData={!!jobId}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onGoHome={() => setShowLanding(true)}
         fileName={fileName}
       />
 
