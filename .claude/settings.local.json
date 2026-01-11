@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\\\Users\\\\Leonard\\\\OneDrive\\\\Desktop\\\\gitrepos\\\\td_profyler\" /s /b)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npm run build:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(.venvScriptsactivate)",
+      "Bash(uvicorn:*)",
+      "Bash(timeout /t 3 /nobreak)",
+      "Bash(python -m uvicorn:*)",
+      "Bash(ping:*)",
+      "Bash(dir:*)",
+      "Bash(\"C:\\\\Users\\\\Leonard\\\\OneDrive\\\\Desktop\\\\gitrepos\\\\td_profyler\\\\backend\\\\venv\\\\Scripts\\\\python.exe\" -m uvicorn app.main:app --reload --port 8001 --app-dir \"C:\\\\Users\\\\Leonard\\\\OneDrive\\\\Desktop\\\\gitrepos\\\\td_profyler\\\\backend\")",
+      "Bash(curl:*)",
+      "Bash(npm run dev)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

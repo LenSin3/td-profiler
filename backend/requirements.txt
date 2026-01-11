@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+pandas
+polars
+openpyxl
+pydantic
+python-multipart
+redis
+pytest
+httpx
+weasyprint
+langchain
+langchain-anthropic
+langchain-google-genai
+python-dotenv

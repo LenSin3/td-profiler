@@ -1,0 +1,15 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\Leonard\OneDrive\Desktop\gitrepos\td_profyler\backend
+plugins: anyio-4.12.1, langsmith-0.6.2
+collected 6 items
+
+tests\test_profiler.py ......                                            [100%]
+
+============================== warnings summary ===============================
+tests/test_profiler.py::test_profile_dataset
+  C:\Users\Leonard\OneDrive\Desktop\gitrepos\td_profyler\backend\app\services\profiler\type_inference.py:19: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+    pd.to_datetime(series.dropna().head(100), errors='raise')
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 6 passed, 1 warning in 0.36s =========================
