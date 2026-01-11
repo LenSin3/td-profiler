@@ -36,6 +36,7 @@ import {
   TableRowSkeleton,
 } from './ui/Skeleton';
 import { NoIssuesFound, ErrorState } from './ui/EmptyState';
+import { API_BASE_URL } from '../config';
 
 interface Props {
   jobId: string;
@@ -81,7 +82,7 @@ const OverviewDashboard: React.FC<Props> = ({ jobId, status, onStatusUpdate }) =
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const response = await axios.get(`http://localhost:8001/api/profile/${jobId}`);
+        const response = await axios.get(`${API_BASE_URL}/api/profile/${jobId}`);
         if (response.data.status === 'completed') {
           setData(response.data.result);
           onStatusUpdate('completed');

@@ -8,10 +8,12 @@ import { Header } from './components/layout/Header';
 import FileUploader from './components/FileUploader';
 import OverviewDashboard from './components/OverviewDashboard';
 import InsightsPanel from './components/InsightsPanel';
+import LandingPage from './components/LandingPage';
 
 import './index.css';
 
 function App() {
+  const [showLanding, setShowLanding] = useState(true);
   const [activeTab, setActiveTab] = useState('upload');
   const [jobId, setJobId] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'processing' | 'completed' | 'failed'>('idle');
@@ -24,6 +26,26 @@ function App() {
     setStatus('processing');
     setActiveTab('dashboard');
   };
+
+  // Show landing page
+  if (showLanding) {
+    return (
+      <>
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            className: 'glass text-sm',
+            style: {
+              background: 'var(--color-bg-elevated)',
+              color: 'var(--color-text-primary)',
+              border: '1px solid var(--color-border)',
+            },
+          }}
+        />
+        <LandingPage onGetStarted={() => setShowLanding(false)} />
+      </>
+    );
+  }
 
   const pageVariants = {
     initial: { opacity: 0, y: 8 },

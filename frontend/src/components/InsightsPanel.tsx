@@ -13,6 +13,7 @@ import type { SelectOption } from './ui/Select';
 import { Badge } from './ui/Badge';
 import { NoInsightsGenerated, ErrorState } from './ui/EmptyState';
 import { CardSkeleton } from './ui/Skeleton';
+import { API_BASE_URL } from '../config';
 
 interface Props {
   jobId: string;
@@ -102,7 +103,7 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8001/api/insights/${jobId}?model=${model}`
+        `${API_BASE_URL}/api/insights/${jobId}?model=${model}`
       );
       setInsights(response.data.insights);
       toast.success('Insights generated successfully!');

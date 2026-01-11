@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { ProgressBar } from './ui/Progress';
+import { API_BASE_URL } from '../config';
 
 interface Props {
   onSuccess: (jobId: string, fileName?: string) => void;
@@ -100,7 +101,7 @@ const FileUploader: React.FC<Props> = ({ onSuccess }) => {
     formData.append('file', filePreview.file);
 
     try {
-      const response = await axios.post('http://localhost:8001/api/upload', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           const progress = progressEvent.total
