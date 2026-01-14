@@ -8,8 +8,6 @@ import { Highlight, themes } from 'prism-react-renderer';
 
 import { Card, CardHeader, CardTitle } from './ui/Card';
 import { Button } from './ui/Button';
-import { Select } from './ui/Select';
-import type { SelectOption } from './ui/Select';
 import { Badge } from './ui/Badge';
 import { NoInsightsGenerated, ErrorState } from './ui/EmptyState';
 import { CardSkeleton } from './ui/Skeleton';
@@ -37,14 +35,6 @@ const renderItem = (item: string | Record<string, unknown>): string => {
   }
   return String(item);
 };
-
-const modelOptions: SelectOption[] = [
-  {
-    value: 'claude-3-5-haiku-latest',
-    label: 'Claude 3.5 Haiku',
-    description: 'Fast and cost-effective',
-  },
-];
 
 function CodeBlock({ code, language = 'yaml' }: { code: string; language?: string }) {
   const [copied, setCopied] = useState(false);
@@ -93,8 +83,9 @@ function CodeBlock({ code, language = 'yaml' }: { code: string; language?: strin
   );
 }
 
+const MODEL_NAME = 'Claude 3.5 Haiku';
+
 const InsightsPanel: React.FC<Props> = ({ jobId }) => {
-  const [model, setModel] = useState('claude-3-5-haiku-latest');
   const [loading, setLoading] = useState(false);
   const [insights, setInsights] = useState<Insights | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -105,7 +96,7 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
 
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/api/insights/${jobId}?model=${model}`
+        `${API_BASE_URL}/api/insights/${jobId}?model=claude-3-5-haiku-latest`
       );
       setInsights(response.data.insights);
       toast.success('Insights generated successfully!');
@@ -119,8 +110,6 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
       setLoading(false);
     }
   };
-
-  const selectedModel = modelOptions.find((opt) => opt.value === model);
 
   // Error state
   if (error && !insights) {
@@ -155,12 +144,9 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Select
-              value={model}
-              onChange={setModel}
-              options={modelOptions}
-              className="w-48"
-            />
+            <Badge variant="default" size="sm">
+              Claude 3.5 Haiku
+            </Badge>
             <Button
               variant="primary"
               onClick={generateInsights}
@@ -195,7 +181,7 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
                 Consulting AI Experts
               </h3>
               <p className="text-sm text-[var(--color-text-muted)] max-w-md">
-                Analyzing your data profile with {selectedModel?.label}...
+                Analyzing your data profile with {MODEL_NAME}...
               </p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -252,7 +238,7 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
                     AI Generated
                   </Badge>
                   <Badge variant="default" size="sm">
-                    {selectedModel?.label}
+                    {MODEL_NAME}
                   </Badge>
                 </div>
               </Card>
