@@ -23,10 +23,16 @@ import {
   TrendingUp,
   ShieldCheck,
   AlertCircle,
+  Download,
+  FileJson,
+  FileSpreadsheet,
+  FileText,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { Card, CardHeader, CardTitle } from './ui/Card';
 import { Badge, TypeBadge, ScoreBadge } from './ui/Badge';
+import { Button } from './ui/Button';
 import { QualityRing, ProgressBar } from './ui/Progress';
 import { Tooltip } from './ui/Tooltip';
 import {
@@ -36,6 +42,7 @@ import {
   TableRowSkeleton,
 } from './ui/Skeleton';
 import { NoIssuesFound, ErrorState } from './ui/EmptyState';
+import ColumnDetailModal from './ColumnDetailModal';
 import { API_BASE_URL } from '../config';
 
 interface Props {
@@ -78,6 +85,45 @@ const OverviewDashboard: React.FC<Props> = ({ jobId, status, onStatusUpdate }) =
   const [data, setData] = useState<ProfileData | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState<string | null>(null);
+  const [selectedColumn, setSelectedColumn] = useState<ColumnData | null>(null);
+
+  const handleExport = async (format: 'json' | 'csv' | 'pdf') => {
+    setExporting(format);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/report/${jobId}?format=${format}`,
+        { responseType: 'blob' }
+      );
+
+      // Get filename from Content-Disposition header or generate one
+      const contentDisposition = response.headers['content-disposition'];
+      const contentType = response.headers['content-type'];
+      let filename = `profile_export.${format}`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (match) filename = match[1];
+      }
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Show appropriate message based on actual content type
+      const actualFormat = contentType?.includes('html') ? 'HTML' : format.toUpperCase();
+      toast.success(`${actualFormat} exported successfully!`);
+    } catch (err) {
+      toast.error(`Failed to export ${format.toUpperCase()}`);
+    } finally {
+      setExporting(null);
+    }
+  };
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -390,6 +436,65 @@ const OverviewDashboard: React.FC<Props> = ({ jobId, status, onStatusUpdate }) =
         </div>
       </div>
 
+      {/* Export buttons */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.15 }}
+      >
+        <Card>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-[var(--radius-lg)] bg-[var(--color-brand)]/10">
+                <Download size={18} className="text-[var(--color-brand)]" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-[var(--color-text-primary)]">Export Results</h3>
+                <p className="text-xs text-[var(--color-text-muted)]">Download your profiling analysis</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Tooltip content="Download as JSON">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={<FileJson size={16} />}
+                  onClick={() => handleExport('json')}
+                  loading={exporting === 'json'}
+                  disabled={exporting !== null}
+                >
+                  JSON
+                </Button>
+              </Tooltip>
+              <Tooltip content="Download as CSV">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={<FileSpreadsheet size={16} />}
+                  onClick={() => handleExport('csv')}
+                  loading={exporting === 'csv'}
+                  disabled={exporting !== null}
+                >
+                  CSV
+                </Button>
+              </Tooltip>
+              <Tooltip content="Download report (PDF or HTML)">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon={<FileText size={16} />}
+                  onClick={() => handleExport('pdf')}
+                  loading={exporting === 'pdf'}
+                  disabled={exporting !== null}
+                >
+                  Report
+                </Button>
+              </Tooltip>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+
       {/* Issues section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Issues summary */}
@@ -498,7 +603,7 @@ const OverviewDashboard: React.FC<Props> = ({ jobId, status, onStatusUpdate }) =
         <Card padding="none">
           <div className="p-6 border-b border-[var(--color-border)]">
             <CardHeader icon={<Columns3 size={18} />}>
-              <CardTitle subtitle="Detailed column-level quality metrics">
+              <CardTitle subtitle="Click any row to see detailed analysis">
                 Column Analysis
               </CardTitle>
             </CardHeader>
@@ -540,7 +645,11 @@ const OverviewDashboard: React.FC<Props> = ({ jobId, status, onStatusUpdate }) =
                   <TableRowSkeleton columns={6} />
                 ) : (
                   table.getRowModel().rows.map((row) => (
-                    <tr key={row.id}>
+                    <tr
+                      key={row.id}
+                      onClick={() => setSelectedColumn(row.original)}
+                      className="cursor-pointer hover:bg-[var(--color-brand)]/5 transition-colors"
+                    >
                       {row.getVisibleCells().map((cell) => (
                         <td key={cell.id}>
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -554,6 +663,14 @@ const OverviewDashboard: React.FC<Props> = ({ jobId, status, onStatusUpdate }) =
           </div>
         </Card>
       </motion.div>
+
+      {/* Column Detail Modal */}
+      <ColumnDetailModal
+        column={selectedColumn}
+        totalRows={data?.summary.row_count || 0}
+        isOpen={selectedColumn !== null}
+        onClose={() => setSelectedColumn(null)}
+      />
     </div>
   );
 };

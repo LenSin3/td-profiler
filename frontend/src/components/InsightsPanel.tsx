@@ -21,26 +21,38 @@ interface Props {
 
 interface Insights {
   executive_summary: string;
-  critical_issues?: string[];
-  recommendations?: string[];
-  dbt_tests?: string[];
+  critical_issues?: (string | Record<string, unknown>)[];
+  recommendations?: (string | Record<string, unknown>)[];
+  dbt_tests?: (string | Record<string, unknown>)[];
 }
+
+// Helper to safely render items that could be strings or objects
+const renderItem = (item: string | Record<string, unknown>): string => {
+  if (typeof item === 'string') return item;
+  if (typeof item === 'object' && item !== null) {
+    // Try common field names the LLM might use
+    const text = item.description || item.text || item.message || item.issue || item.recommendation || item.test;
+    if (typeof text === 'string') return text;
+    return JSON.stringify(item);
+  }
+  return String(item);
+};
 
 const modelOptions: SelectOption[] = [
   {
-    value: 'claude-3-haiku-20240307',
-    label: 'Claude 3 Haiku',
+    value: 'claude-3-5-haiku-latest',
+    label: 'Claude 3.5 Haiku',
     description: 'Fast and cost-effective',
   },
   {
-    value: 'gemini-1.5-pro',
-    label: 'Gemini 1.5 Pro',
-    description: 'Google\'s advanced model',
+    value: 'claude-3-5-sonnet-latest',
+    label: 'Claude 3.5 Sonnet',
+    description: 'Balanced performance',
   },
   {
-    value: 'claude-3-sonnet-20240229',
-    label: 'Claude 3 Sonnet',
-    description: 'Balanced performance',
+    value: 'gemini-1.5-flash',
+    label: 'Gemini 1.5 Flash',
+    description: 'Google\'s fast model',
   },
 ];
 
@@ -92,7 +104,7 @@ function CodeBlock({ code, language = 'yaml' }: { code: string; language?: strin
 }
 
 const InsightsPanel: React.FC<Props> = ({ jobId }) => {
-  const [model, setModel] = useState('claude-3-haiku-20240307');
+  const [model, setModel] = useState('claude-3-5-haiku-latest');
   const [loading, setLoading] = useState(false);
   const [insights, setInsights] = useState<Insights | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -240,7 +252,9 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
                 </CardHeader>
 
                 <p className="text-[var(--color-text-secondary)] leading-relaxed relative z-10">
-                  {insights.executive_summary}
+                  {typeof insights.executive_summary === 'string'
+                    ? insights.executive_summary
+                    : JSON.stringify(insights.executive_summary)}
                 </p>
 
                 <div className="mt-4 flex items-center gap-2">
@@ -275,7 +289,7 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
                         className="flex items-start gap-3 p-3 rounded-[var(--radius-lg)] bg-[var(--color-danger)]/5 border border-[var(--color-danger)]/10"
                       >
                         <AlertTriangle size={16} className="text-[var(--color-danger)] mt-0.5 shrink-0" />
-                        <p className="text-sm text-[var(--color-text-secondary)]">{issue}</p>
+                        <p className="text-sm text-[var(--color-text-secondary)]">{renderItem(issue)}</p>
                       </div>
                     ))}
                   </div>
@@ -308,7 +322,7 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
                             </span>
                           </div>
                           <p className="text-sm text-[var(--color-text-muted)] leading-relaxed pt-1">
-                            {rec}
+                            {renderItem(rec)}
                           </p>
                         </div>
                       ))}
@@ -332,7 +346,7 @@ const InsightsPanel: React.FC<Props> = ({ jobId }) => {
                     </CardHeader>
 
                     <CodeBlock
-                      code={insights.dbt_tests.map((test) => `- ${test}`).join('\n')}
+                      code={insights.dbt_tests.map((test) => `- ${renderItem(test)}`).join('\n')}
                       language="yaml"
                     />
                   </Card>

@@ -16,7 +16,7 @@ class AIInsight(BaseModel):
 
 class LLMService:
     def __init__(self):
-        self.default_model = "claude-3-haiku-20240307"
+        self.default_model = "claude-3-5-haiku-latest"
 
     def get_model(self, model_name: str):
         if "claude" in model_name.lower():
@@ -31,8 +31,18 @@ class LLMService:
         llm = self.get_model(model_name)
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert data quality analyst. Analyze the following data profiling results and provide actionable insights in JSON format."),
-            ("user", "PROFILING RESULTS:\n{results}\n\nPlease provide: executive_summary, critical_issues, recommendations, and dbt_tests.")
+            ("system", """You are an expert data quality analyst. Analyze the data profiling results and respond with ONLY valid JSON (no markdown, no code blocks).
+
+The JSON must have this exact structure with string values only:
+{{
+  "executive_summary": "A 2-3 sentence overview of the data quality.",
+  "critical_issues": ["Issue 1 description", "Issue 2 description"],
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "dbt_tests": ["unique: column_name", "not_null: column_name"]
+}}
+
+IMPORTANT: All array items must be simple strings, not objects. For dbt_tests, use simple test notation like "unique: id" or "not_null: email"."""),
+            ("user", "PROFILING RESULTS:\n{results}\n\nRespond with valid JSON only.")
         ])
         
         chain = prompt | llm | JsonOutputParser()
