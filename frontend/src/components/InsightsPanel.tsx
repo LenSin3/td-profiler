@@ -44,16 +44,6 @@ const modelOptions: SelectOption[] = [
     label: 'Claude 3.5 Haiku',
     description: 'Fast and cost-effective',
   },
-  {
-    value: 'claude-3-5-sonnet-latest',
-    label: 'Claude 3.5 Sonnet',
-    description: 'Balanced performance',
-  },
-  {
-    value: 'gemini-1.5-flash',
-    label: 'Gemini 1.5 Flash',
-    description: 'Google\'s fast model',
-  },
 ];
 
 function CodeBlock({ code, language = 'yaml' }: { code: string; language?: string }) {

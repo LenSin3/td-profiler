@@ -478,7 +478,7 @@ const OverviewDashboard: React.FC<Props> = ({ jobId, status, onStatusUpdate }) =
                   CSV
                 </Button>
               </Tooltip>
-              <Tooltip content="Download report (PDF or HTML)">
+              <Tooltip content="Download HTML report">
                 <Button
                   variant="primary"
                   size="sm"
@@ -487,7 +487,7 @@ const OverviewDashboard: React.FC<Props> = ({ jobId, status, onStatusUpdate }) =
                   loading={exporting === 'pdf'}
                   disabled={exporting !== null}
                 >
-                  Report
+                  HTML Report
                 </Button>
               </Tooltip>
             </div>

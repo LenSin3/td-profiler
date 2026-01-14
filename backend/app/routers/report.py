@@ -102,38 +102,18 @@ def _export_csv(result: dict, filename: str, timestamp: str) -> StreamingRespons
 
 
 def _export_pdf(result: dict, filename: str, timestamp: str, job: dict) -> StreamingResponse:
-    """Export formatted PDF report. Falls back to HTML if WeasyPrint unavailable."""
+    """Export formatted HTML report (PDF requires system dependencies)."""
     html_content = _generate_html_report(result, filename, job)
 
-    try:
-        from weasyprint import HTML
-        pdf_bytes = HTML(string=html_content).write_pdf()
-
-        return StreamingResponse(
-            io.BytesIO(pdf_bytes),
-            media_type="application/pdf",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}_report_{timestamp}.pdf"'
-            }
-        )
-    except ImportError:
-        # WeasyPrint not installed - return HTML instead
-        return StreamingResponse(
-            io.BytesIO(html_content.encode('utf-8')),
-            media_type="text/html",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}_report_{timestamp}.html"'
-            }
-        )
-    except Exception as e:
-        # WeasyPrint failed (missing GTK etc) - return HTML instead
-        return StreamingResponse(
-            io.BytesIO(html_content.encode('utf-8')),
-            media_type="text/html",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}_report_{timestamp}.html"'
-            }
-        )
+    # Return HTML report directly - PDF generation requires GTK libraries
+    # Users can print to PDF from browser if needed
+    return StreamingResponse(
+        io.BytesIO(html_content.encode('utf-8')),
+        media_type="text/html",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}_report_{timestamp}.html"'
+        }
+    )
 
 
 def _generate_html_report(result: dict, filename: str, job: dict) -> str:
