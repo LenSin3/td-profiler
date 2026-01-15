@@ -53,7 +53,7 @@ const features = [
 
 const stats = [
   { value: '50+', label: 'Quality Checks' },
-  { value: '3', label: 'AI Models' },
+  { value: 'Claude', label: 'AI Powered' },
   { value: '<10s', label: 'Avg. Analysis' },
   { value: '100%', label: 'Privacy Safe' },
 ];
@@ -77,9 +77,7 @@ const LandingPage: React.FC<Props> = ({ onGetStarted }) => {
       {/* Navigation */}
       <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-accent)]">
-            <Database size={24} className="text-white" />
-          </div>
+          <img src="/logo.svg" alt="TD Profiler" className="w-10 h-10" />
           <span className="text-xl font-bold text-[var(--color-text-primary)]">
             TD Profiler
           </span>
@@ -341,9 +339,7 @@ const LandingPage: React.FC<Props> = ({ onGetStarted }) => {
       <footer className="relative z-10 px-8 py-8 border-t border-[var(--color-border)]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-accent)]">
-              <Database size={16} className="text-white" />
-            </div>
+            <img src="/logo.svg" alt="TD Profiler" className="w-7 h-7" />
             <span className="text-sm text-[var(--color-text-muted)]">
               TD Profiler &copy; 2026
             </span>

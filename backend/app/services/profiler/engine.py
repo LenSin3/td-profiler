@@ -1,7 +1,7 @@
 import pandas as pd
 from app.services.profiler.type_inference import infer_column_type
 from app.services.profiler.completeness import calculate_completeness
-from app.services.profiler.statistics import calculate_basic_stats
+from app.services.profiler.statistics import calculate_basic_stats, get_top_values
 from app.services.profiler.outliers import detect_outliers
 from app.services.profiler.patterns import analyze_patterns
 from app.utils.semantic_types import detect_semantic_type
@@ -53,7 +53,8 @@ def profile_dataset(df: pd.DataFrame) -> Dict[str, Any]:
         
         distinct_count = int(series.nunique())
         is_unique = (distinct_count == total_rows)
-        
+        top_values = get_top_values(series)
+
         col_profile = {
             "name": col_name,
             "inferred_type": inferred_type,
@@ -65,6 +66,7 @@ def profile_dataset(df: pd.DataFrame) -> Dict[str, Any]:
             "stats": basic_stats,
             "outliers": outliers,
             "patterns": patterns,
+            "top_values": top_values,
             "quality_score": col_score,
             "issues": col_issues
         }

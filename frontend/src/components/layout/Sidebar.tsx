@@ -4,7 +4,6 @@ import {
   Upload,
   LayoutDashboard,
   Brain,
-  Database,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -60,9 +59,7 @@ export function Sidebar({
         className="flex items-center gap-3 p-4 border-b border-[var(--color-border)] hover:bg-[var(--color-surface)] transition-colors duration-200 w-full text-left"
         title="Back to home"
       >
-        <div className="shrink-0 p-2 rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-accent)] shadow-lg shadow-[var(--color-brand)]/20">
-          <Database size={20} className="text-white" />
-        </div>
+        <img src="/logo.svg" alt="TD Profiler" className="shrink-0 w-10 h-10" />
         {!collapsed && (
           <div className="overflow-hidden">
             <h1 className="font-bold text-lg gradient-text whitespace-nowrap">

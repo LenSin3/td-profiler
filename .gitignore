@@ -5,3 +5,4 @@ __pycache__/
 node_modules/
 dist/
 nul
+diabetes_self_management.csv

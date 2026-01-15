@@ -80,11 +80,17 @@ app/
 1. User uploads file → `POST /api/upload` → returns `job_id`, starts background task
 2. Background task: `parse_file()` → `profile_dataset()` → stores in `job_manager`
 3. Frontend polls `GET /api/profile/{job_id}` until status is "completed"
-4. AI insights fetched separately via `GET /api/insights/{job_id}?model=<model>`
+4. AI insights fetched separately via `GET /api/insights/{job_id}` (uses Claude 3.5 Haiku)
 
 ### Profiling Pipeline (`profile_dataset()` in engine.py)
 
-For each column: type inference → semantic type detection → completeness stats → basic stats → outlier detection → pattern analysis → score calculation
+For each column: type inference → semantic type detection → completeness stats → basic stats → outlier detection → pattern analysis → top values → score calculation
+
+### Rate Limiting & Security
+
+- IP-based rate limiting: 5 uploads/hour, 3 AI insights/hour per IP
+- Max file size: 5 MB
+- Jobs auto-expire after 1 hour (in-memory storage, no persistence)
 
 ## Tech Stack Notes
 

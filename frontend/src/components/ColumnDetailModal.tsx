@@ -39,6 +39,7 @@ interface ColumnData {
   stats: Record<string, number>;
   outliers: { count: number; threshold: string };
   patterns: { top_patterns?: { pattern: string; percentage: number }[] };
+  top_values?: { value: string; count: number; percentage: number }[];
   quality_score: number;
   issues: { severity: string; issue: string; type: string }[];
 }
@@ -67,16 +68,18 @@ const ColumnDetailModal: React.FC<Props> = ({ column, totalRows, isOpen, onClose
   // Prepare distribution data for chart
   const distributionData = [];
 
-  if (column.inferred_type === 'string' && column.patterns?.top_patterns) {
-    column.patterns.top_patterns.slice(0, 8).forEach((p) => {
+  if (column.top_values && column.top_values.length > 0) {
+    // Use actual top values for all column types (shows real data values)
+    column.top_values.slice(0, 8).forEach((v) => {
       distributionData.push({
-        name: p.pattern.length > 15 ? p.pattern.substring(0, 15) + '...' : p.pattern,
-        value: p.percentage,
-        fullName: p.pattern,
+        name: v.value.length > 15 ? v.value.substring(0, 15) + '...' : v.value,
+        value: v.percentage,
+        count: v.count,
+        fullName: v.value,
       });
     });
   } else if (['integer', 'float'].includes(column.inferred_type) && column.stats) {
-    // For numeric, show a simple stats summary
+    // Fallback for numeric columns without top_values
     const { min, max, mean, median } = column.stats;
     if (min !== undefined) {
       distributionData.push(
@@ -235,7 +238,7 @@ const ColumnDetailModal: React.FC<Props> = ({ column, totalRows, isOpen, onClose
                     <div>
                       <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
                         <Percent size={16} className="text-[var(--color-brand)]" />
-                        {['integer', 'float'].includes(column.inferred_type) ? 'Value Range' : 'Top Patterns'}
+                        Top Values
                       </h3>
                       <div className="h-48 p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
                         <ResponsiveContainer width="100%" height="100%">
